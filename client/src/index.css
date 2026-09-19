@@ -1,19 +1,19 @@
 :root {
-  --paper: #eef3f0;
-  --white: #ffffff;
-  --ink: #0f1f1a;
-  --muted: #5c6e66;
-  --forest: #0b6e4f;
-  --red: #c4302b;
-  --amber: #b26a00;
-  --blue: #2a5d9f;
-  --rule: #c9d6cf;
+  --paper: #091411;
+  --white: #12231d;
+  --ink: #edf8f1;
+  --muted: #9ab2a6;
+  --forest: #45c48a;
+  --red: #ff746e;
+  --amber: #f2b75f;
+  --blue: #81b5ff;
+  --rule: #294238;
   --font-display: "Bricolage Grotesque", sans-serif;
   --font-body: "Instrument Sans", sans-serif;
 }
 
 * { box-sizing: border-box; }
-html { min-width: 320px; background: var(--paper); }
+html { min-width: 320px; background: var(--paper); color-scheme: dark; }
 body { min-width: 320px; margin: 0; background: var(--paper); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
 button, input { font-family: inherit; }
-::selection { color: var(--paper); background: var(--forest); }
+::selection { color: #06110d; background: var(--forest); }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Finding, FindingModule, ScanResult } from "../../../lib/types";
 import "./home.css";
 
@@ -47,6 +47,8 @@ function Group({ group, findings }: { group: typeof GROUPS[number]; findings: Fi
 }
 
 export default function Home() {
+  const cursorDotRef = useRef<HTMLDivElement>(null);
+  const cursorRingRef = useRef<HTMLDivElement>(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState("");
@@ -59,6 +61,47 @@ export default function Home() {
     secrets: result?.findings.filter((finding: Finding) => finding.module === "secrets") ?? [],
     backend: result?.findings.filter((finding: Finding) => finding.module === "backend") ?? [],
   }), [result]);
+
+  useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const dot = cursorDotRef.current;
+    const ring = cursorRingRef.current;
+    if (!dot || !ring) return;
+    document.documentElement.classList.add("custom-cursor");
+    let targetX = -40;
+    let targetY = -40;
+    let ringX = targetX;
+    let ringY = targetY;
+    let frame = 0;
+    const render = () => {
+      ringX += (targetX - ringX) * 0.16;
+      ringY += (targetY - ringY) * 0.16;
+      dot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+      frame = requestAnimationFrame(render);
+    };
+    const move = (event: PointerEvent) => {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      const interactive = (event.target as HTMLElement | null)?.closest("a, button, input, textarea");
+      ring.classList.toggle("is-interactive", Boolean(interactive));
+      dot.classList.add("is-visible");
+      ring.classList.add("is-visible");
+    };
+    const leave = () => {
+      dot.classList.remove("is-visible");
+      ring.classList.remove("is-visible");
+    };
+    document.addEventListener("pointermove", move, { passive: true });
+    document.addEventListener("pointerleave", leave);
+    frame = requestAnimationFrame(render);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerleave", leave);
+      document.documentElement.classList.remove("custom-cursor");
+    };
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,6 +130,8 @@ export default function Home() {
 
   return (
     <div className="site-shell">
+      <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
+      <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <header className="site-header">
         <a className="brand" href="/" aria-label="VibeGuard home"><span className="brand-mark">V</span><span>VibeGuard</span></a>
         <span className="header-note">A second set of eyes for AI-built apps</span>
@@ -94,6 +139,7 @@ export default function Home() {
 
       <main className="main-content">
         <section className="hero" aria-labelledby="page-title">
+          <div className="hero-orbit" aria-hidden="true" />
           <div className="hero-copy">
             <p className="eyebrow"><span className="eyebrow-dot" /> Repository security check</p>
             <h1 id="page-title">Check what your AI builder <em>actually shipped.</em></h1>

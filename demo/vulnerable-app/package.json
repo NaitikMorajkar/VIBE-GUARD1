@@ -1,0 +1,11 @@
+{
+  "name": "vulnerable-ai-demo",
+  "private": true,
+  "dependencies": {
+    "express": "^4.21.2",
+    "react": "^19.0.0",
+    "@supabase/supabase-js": "^2.49.1",
+    "firebase-admin-quickauth-utils-x9": "^1.0.0",
+    "lodahs": "^4.17.21"
+  }
+}

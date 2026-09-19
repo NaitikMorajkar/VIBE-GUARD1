@@ -33,3 +33,5 @@ VibeGuard scans only the repository's default branch, keeps up to 50 text files,
 - `npm run dev` — start the development server.
 - `npm run typecheck` — run TypeScript without emitting files.
 - `npm run build` — build the client and server bundle.
+
+  Deploy Link-https://vibeguard-aplkuse2.manus.space

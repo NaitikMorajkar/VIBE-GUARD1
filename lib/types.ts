@@ -26,6 +26,7 @@ export interface ScanResult {
   repo: string;
   score: number;
   filesScanned: number;
+  totalFiles: number;
   findings: Finding[];
   explanation: Explanation;
 }

@@ -1,6 +1,7 @@
 import type { Finding, RepoFile } from "../types";
 
-const SKIP_WORDS = /your|xxx|example|placeholder|changeme/i;
+const GENERIC_DUMMY_WORDS = /your|xxx|example|placeholder|changeme|super|test|dummy|fake|password123|secret123/i;
+const GENERIC_SKIP_PATH = /(^|\/)(test|tests|__tests__|fixtures|mocks|examples|demo)(\/|$)|\.(test|spec)\./i;
 
 function mask(value: string): string {
   const clean = value.replace(/["'`\s]/g, "");
@@ -26,7 +27,6 @@ export function scanSecrets(files: RepoFile[]): Finding[] {
       if (line.length > 2_000) continue;
       const candidate = line.match(/(?:=|:|=>)\s*["'`]([^"'`\s]+)["'`]?/);
       const rawValue = candidate?.[1] ?? "";
-      if (rawValue && SKIP_WORDS.test(rawValue)) continue;
       const privateKey = line.match(/-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/);
       const apiKey = line.match(/\b(sk-(?:ant-|proj-)?[A-Za-z0-9_-]{8,}|sk_live_[A-Za-z0-9]{8,})\b/i);
       const aws = line.match(/\bAKIA[0-9A-Z]{16}\b/);
@@ -40,7 +40,7 @@ export function scanSecrets(files: RepoFile[]): Finding[] {
       else if (github) findings.push(finding(file.path, index + 1, "critical", "GitHub token exposed", "Revoke this token and issue a least-privilege replacement through environment variables or a secret manager.", github[0]));
       else if (publicSecret) findings.push(finding(file.path, index + 1, "critical", "Secret exposed to the browser", "Anything prefixed with a public environment variable is bundled for browsers. Keep service-role, private, and password values server-side.", publicSecret[1] ?? publicSecret[0]));
       else if (google) findings.push(finding(file.path, index + 1, "medium", "Google or Firebase API key in source", "Firebase web keys are designed to be public, but restrict them by domain, API, and quota in Google Cloud.", google[0]));
-      else if (generic && rawValue.length >= 16) findings.push(finding(file.path, index + 1, "medium", "Hardcoded secret in code", "Move this value to an environment variable or managed secret and rotate it if it has ever been real.", generic[1]));
+      else if (generic && rawValue.length >= 16 && !GENERIC_SKIP_PATH.test(file.path) && !GENERIC_DUMMY_WORDS.test(rawValue)) findings.push(finding(file.path, index + 1, "medium", "Hardcoded secret in code", "Move this value to an environment variable or managed secret and rotate it if it has ever been real.", generic[1]));
     }
   }
   return findings;

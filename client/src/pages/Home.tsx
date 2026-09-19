@@ -127,7 +127,7 @@ export default function Home() {
             <div className="score-card">
               <div className="score-number"><span>{result.score}</span><small>/100</small></div>
               <div className="score-context"><span className={`verdict verdict-${currentVerdict.tone}`}>{currentVerdict.label}</span><p>{result.explanation.summary}</p></div>
-              <div className="scan-stats"><div><strong>{result.findings.length}</strong><span>Findings</span></div><div><strong>{result.filesScanned}</strong><span>Files scanned</span></div></div>
+              <div className="scan-stats"><div><strong>{result.findings.length}</strong><span>Findings</span></div><div><strong>{result.filesScanned} of {result.totalFiles}</strong><span>Files scanned</span></div>{result.totalFiles > 50 && <p className="scan-cap-note">Only the highest-priority files were scanned.</p>}</div>
             </div>
 
             <div className="results-heading"><div><span className="section-kicker">The signal</span><h2>What needs your attention</h2></div><button className="details-button" type="button" onClick={() => setShowDetails(value => !value)}>{showDetails ? "Hide detail" : "Show detail"} <span aria-hidden="true">{showDetails ? "−" : "+"}</span></button></div>

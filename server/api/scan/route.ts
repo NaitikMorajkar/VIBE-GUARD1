@@ -17,7 +17,7 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const parsed = parseRepoUrl(body.repoUrl);
-    const files = await fetchRepoFiles(parsed.owner, parsed.repo);
+    const { files, totalFiles } = await fetchRepoFiles(parsed.owner, parsed.repo);
     if (files.length === 0) {
       return Response.json({ error: "No scannable text files were found in that repository. It may be empty, binary-only, or over the scan limits." }, { status: 422 });
     }
@@ -32,6 +32,7 @@ export async function POST(request: Request): Promise<Response> {
       repo,
       score: computeScore(findings),
       filesScanned: files.length,
+      totalFiles,
       findings,
       explanation: await explain(findings, repo),
     };

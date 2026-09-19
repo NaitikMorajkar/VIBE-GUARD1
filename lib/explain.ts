@@ -3,10 +3,13 @@ import type { Explanation, Finding } from "./types";
 function fallback(findings: Finding[], repo: string): Explanation {
   if (findings.length === 0) return { summary: `We scanned ${repo} and found no obvious issues in the files we could inspect. That is a useful signal, but it is not a guarantee that the app is secure.`, fixPrompt: "" };
   const critical = findings.filter(finding => finding.severity === "critical").length;
+  const summary = findings.length === 1
+    ? `Found 1 issue (${findings[0]?.severity ?? "unknown"}). ${critical > 0 ? "Address the critical issue first." : "Nothing critical."}`
+    : `Found ${findings.length} issues in ${repo}. ${critical > 0 ? `Address the ${critical} critical ${critical === 1 ? "one" : "ones"} first.` : "Nothing critical."} Review each finding and scan again after making the changes.`;
   const numbered = findings.map((finding, index) => `${index + 1}. ${finding.title}${finding.file ? ` in ${finding.file}${finding.line ? `:${finding.line}` : ""}` : ""} — ${finding.detail}`).join("\n");
   return {
-    summary: `We found ${findings.length} security issue${findings.length === 1 ? "" : "s"} in ${repo}, including ${critical} critical issue${critical === 1 ? "" : "s"}. Start with the most severe findings because exposed secrets, open database rules, and unsafe dependencies can be abused quickly. Review the suggested files and scan again after making the changes.`,
-    fixPrompt: `Act as a careful security engineer. Fix every issue below in the repository, step by step. Rotate any exposed credentials instead of merely hiding them, keep privileged keys server-side, add least-privilege access rules, and verify the app still works. Name each file you change and finish by running the project's tests and typecheck.\n\n${numbered}`,
+    summary,
+    fixPrompt: `Act as a careful security engineer. Fix ${findings.length === 1 ? "the issue" : "every issue"} below in the repository, step by step. Rotate any exposed credentials instead of merely hiding them, keep privileged keys server-side, add least-privilege access rules, and verify the app still works. Name each file you change and finish by running the project's tests and typecheck.\n\n${numbered}`,
   };
 }
 

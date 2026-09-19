@@ -112,7 +112,7 @@ export default function Home() {
         </section>
 
         {!result && !loading && (
-          <section className="how-it-works" aria-label="What VibeGuard checks">
+          <section className="how-it-works depth-stage" aria-label="What VibeGuard checks">
             <div className="mini-card"><span className="mini-number">01</span><strong>Scan the surface</strong><p>Up to 50 text files from the repo’s default branch.</p></div>
             <div className="mini-card"><span className="mini-number">02</span><strong>Spot the signals</strong><p>Dependencies, credentials, database rules, and RLS.</p></div>
             <div className="mini-card"><span className="mini-number">03</span><strong>Make the repair</strong><p>Copy a focused prompt into your AI builder.</p></div>
